@@ -1,0 +1,896 @@
+/* Elastic behavior, Skiff UI's neutral surfaces and type scale.
+ * See the repository README for attribution. This stylesheet has no build step;
+ * the compiled material.js (ui-src) owns a few MUI islands. */
+@font-face {
+    font-family: "Inter";
+    src: url(../fonts/inter-variable.woff2?v=4.1) format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+@media screen {
+    :root {
+        color-scheme: light;
+        --fm-bg: #ffffff;
+        --fm-side: #f5f5f5;
+        --fm-content: #fafafa;
+        --fm-text: #202020;
+        --fm-read-text: #3a3a3a;
+        --fm-muted: #656565;
+        --fm-border: #e4e4e4;
+        --fm-hover: #f0f0f0;
+        --fm-selected: #e8e8e8;
+        --fm-row-selected: #1b5fc7;
+        --fm-selected-text: #ffffff;
+        --fm-selected-muted: rgba(255, 255, 255, .86);
+        --fm-unread-text: #111111;
+        --fm-field: #f4f4f4;
+        --fm-primary: #202020;
+        --fm-primary-text: #ffffff;
+        /* Links and status marks stay in the same neutral ink as the rest of the
+           chrome; the warm accent belonged to the old interface. */
+        --fm-accent: #202020;
+        --fm-focus: #6f6f6f;
+        --fm-unread: #f8f9fa;
+        --fm-border-strong: #8a8a8a;
+        /* One 4px spacing scale and one type scale for list, reader, compose,
+           dialogs and login. Component rules below use these tokens. */
+        --fm-space-1: 4px;
+        --fm-space-2: 8px;
+        --fm-space-3: 12px;
+        --fm-space-4: 16px;
+        --fm-space-5: 24px;
+        --fm-space-6: 32px;
+        --fm-text-xs: 11px;
+        --fm-text-sm: 12px;
+        --fm-text-base: 13px;
+        --fm-text-md: 14px;
+        --fm-text-lg: 16px;
+        --fm-text-xl: 21px;
+        --fm-text-2xl: 28px;
+        --fm-line-tight: 20px;
+        --fm-line-base: 22px;
+        --fm-radius-sm: 6px;
+        --fm-radius-md: 8px;
+        --fm-radius-lg: 12px;
+    }
+    :root.dark-mode {
+        color-scheme: dark;
+        --fm-bg: #1f1f1f;
+        --fm-side: #171717;
+        --fm-content: #1c1c1c;
+        --fm-text: #efefef;
+        --fm-read-text: #d0d0d0;
+        --fm-muted: #989898;
+        --fm-border: #353535;
+        --fm-hover: #292929;
+        --fm-selected: #333333;
+        --fm-row-selected: #1b5fc7;
+        --fm-selected-text: #ffffff;
+        --fm-selected-muted: rgba(255, 255, 255, .86);
+        --fm-unread-text: #ffffff;
+        --fm-field: #292929;
+        --fm-primary: #efefef;
+        --fm-primary-text: #1f1f1f;
+        --fm-accent: #efefef;
+        --fm-focus: #9a9a9a;
+        --fm-unread: #232323;
+        --fm-border-strong: #8a8a8a;
+    }
+    html:root { font-size: 14px; scrollbar-color: var(--fm-border) var(--fm-bg); }
+    html:root body {
+        color: var(--fm-text);
+        background: var(--fm-bg);
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+    }
+    html:root a { color: var(--fm-accent); }
+    html:root :is(button, input, select, textarea, .ui-widget) { font-family: inherit; }
+    html:root :is(a, button, input, select, textarea, [tabindex]):focus-visible {
+        outline: 2px solid var(--fm-focus) !important;
+        outline-offset: -2px;
+    }
+    html:root #layout { height: 100%; height: 100dvh; }
+    html:root :is(#layout-list, #layout-content, #layout-sidebar) { min-height: 0; min-width: 0; border-color: var(--fm-border); }
+    html:root #layout-list { background: var(--fm-bg); }
+    html:root #layout-content { background: var(--fm-content); }
+    html:root #layout-sidebar { background: var(--fm-side); }
+    html:root #layout > div > :is(.header, .footer) {
+        color: var(--fm-text);
+        background: transparent;
+        border-color: var(--fm-border);
+        font-weight: 500;
+    }
+    html:root #layout > div > .header { height: 56px; min-height: 56px; line-height: 56px; }
+    html:root #layout > div > .footer { font-size: 13px; }
+    html:root :is(.menu.toolbar a, .header a.button.icon, .menu.pagenav a) { color: var(--fm-muted); }
+    /* Native commands stay in the DOM; an unavailable one must still read as unavailable. */
+    html:root :is(.menu.toolbar a, .header a.button.icon, .menu.pagenav a).disabled { opacity: .35; cursor: default; }
+    html:root :is(.menu.toolbar a, .header a.button.icon, .menu.pagenav a):not(.disabled):hover {
+        color: var(--fm-text);
+        background: var(--fm-hover);
+    }
+    html:root #layout-menu { background: var(--fm-side); border-right: 1px solid var(--fm-border); flex-shrink: 0; }
+    /* Same height as the list and reader headers: one shared top line across the columns. */
+    html:root #layout-menu .popover-header { background: transparent !important; height: 56px; line-height: normal; border-bottom: 1px solid var(--fm-border); }
+    .fezadan-brand { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--fm-text); white-space: nowrap; }
+    .fezadan-logo {
+        display: inline-block;
+        flex: 0 0 30px;
+        width: 30px;
+        height: 20px;
+        background: currentColor;
+        -webkit-mask: url(../images/logo.svg?v=1) center / contain no-repeat;
+        mask: url(../images/logo.svg?v=1) center / contain no-repeat;
+    }
+    /* Account switcher: the active mailbox is a single row and its chevron opens
+       the other signed-in mailboxes. A native <details> supplies the open/closed
+       state to keyboard and screen readers without a custom script. */
+    .fezadan-accounts { padding: 8px 8px 10px; border-bottom: 1px solid var(--fm-border); }
+    .fezadan-account-list { display: flex; flex-direction: column; gap: 1px; margin-top: 3px; }
+    /* Elastic decorates these buttons with .btn/.btn-secondary; they are plain rows. */
+    html:root .fezadan-accounts :is(.fezadan-account, .fezadan-account-add) {
+        display: flex; align-items: center; gap: 8px; width: 100%;
+        min-height: 32px; padding: 0 8px; border: 0; border-radius: 6px;
+        background: transparent; color: var(--fm-muted);
+        font: inherit; font-size: 13px; font-weight: 400; text-align: left; cursor: pointer;
+    }
+    html:root .fezadan-accounts :is(.fezadan-account, .fezadan-account-add):hover,
+    html:root .fezadan-accounts :is(.fezadan-account, .fezadan-account-add):focus-visible {
+        color: var(--fm-text); background: var(--fm-hover);
+    }
+    html:root .fezadan-accounts > .fezadan-account.is-active { color: var(--fm-text); background: var(--fm-selected); font-weight: 600; }
+    .fezadan-account-add { margin-top: 2px; }
+    .fezadan-account-mail { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fezadan-accounts > summary { list-style: none; }
+    .fezadan-accounts > summary::-webkit-details-marker { display: none; }
+    html:root .fezadan-accounts > summary.is-active:hover,
+    html:root .fezadan-accounts > summary.is-active:focus-visible { background: var(--fm-hover); }
+    .fezadan-account-chevron { flex: 0 0 14px; width: 14px; height: 14px; margin-left: auto; color: var(--fm-muted); }
+    .fezadan-account-chevron::before {
+        content: ""; display: block; width: 5px; height: 5px; margin: 2px auto 0;
+        border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+        transform: rotate(45deg);
+    }
+    .fezadan-accounts[open] .fezadan-account-chevron::before { margin-top: 5px; transform: rotate(-135deg); }
+    .fezadan-mark {
+        display: inline-block;
+        flex: 0 0 24px;
+        width: 24px;
+        height: 24px;
+        background: currentColor;
+        -webkit-mask: url(../images/inbox.svg?v=1) center / contain no-repeat;
+        mask: url(../images/inbox.svg?v=1) center / contain no-repeat;
+    }
+    html:root #taskmenu a { color: var(--fm-muted); border-radius: 6px; }
+    html:root #taskmenu a.selected { color: var(--fm-text); background: var(--fm-selected); }
+    html:root #taskmenu a:hover { color: var(--fm-text); background: var(--fm-hover); }
+    html:root #taskmenu .action-buttons a,
+    html:root .floating-action-buttons a.compose {
+        color: var(--fm-primary-text);
+        background: var(--fm-primary);
+        box-shadow: none;
+        font-weight: 600;
+    }
+    html:root #taskmenu .action-buttons a:hover,
+    html:root .floating-action-buttons a.compose:hover { opacity: .9; background: var(--fm-primary); }
+    html:root #taskmenu a.compose::before {
+        content: "+";
+        display: inline-block;
+        width: 20px !important;
+        min-width: 20px;
+        height: 20px !important;
+        background: transparent;
+        font: 400 24px/20px "Inter", sans-serif;
+    }
+    html:root #taskmenu a.compose { display: flex; align-items: center; justify-content: flex-start; gap: 8px; }
+    html:root #taskmenu .special-buttons { background: var(--fm-side) !important; }
+    html:root #taskmenu .special-buttons a:not(:focus) { background: transparent; }
+    html:root #taskmenu a.logout { color: var(--fm-muted) !important; }
+    html:root #taskmenu a.logout:hover { color: var(--fm-text) !important; }
+    html:root .listing :is(li, tbody td) { border-color: var(--fm-border); }
+    html:root .listing :is(li a, tbody td, tbody td a) { color: var(--fm-text); }
+    html:root .listing :is(li.selected > a, tr.selected td) { color: var(--fm-text); background: var(--fm-selected); }
+    html:root .folderlist { padding: 6px 8px; }
+    html:root .folderlist li { border: 0; }
+    html:root .folderlist li > a { position: relative; border-radius: var(--fm-radius-sm); padding: 0 46px 0 7px; line-height: 34px; font-size: var(--fm-text-md); }
+    html:root .folderlist li > a:hover { background: var(--fm-hover); }
+    /* Icons and names share one text grid; the count is a quiet pill at the end. */
+    html:root .folderlist li > a::before { width: 18px; margin-right: 10px; text-align: center; }
+    html:root .folderlist li.mailbox .unreadcount {
+        position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
+        min-width: 20px; height: 20px; margin: 0; padding: 0 6px;
+        border-radius: 10px; color: var(--fm-muted); background: var(--fm-hover);
+        font-size: var(--fm-text-xs); font-weight: 600; line-height: 20px; text-align: center;
+        font-variant-numeric: tabular-nums;
+    }
+    html:root .folderlist li.selected.mailbox .unreadcount { color: var(--fm-text); background: var(--fm-bg); }
+    html:root .folderlist li.mailbox.unread > a { font-weight: 600; }
+    html:root .searchbar {
+        background: transparent;
+        border-color: var(--fm-border);
+        padding: 6px 16px;
+        min-height: 48px;
+    }
+    html:root .searchbar form { background: var(--fm-field); border: 1px solid var(--fm-border-strong); border-radius: var(--fm-radius-md); }
+    html:root .searchbar :is(a, input) { color: var(--fm-muted); }
+    /* `form::before` cannot sit inside :is() — a pseudo-element there invalidates the rule. */
+    html:root .searchbar form::before { color: var(--fm-muted); height: 34px; line-height: 34px; margin-left: 10px; font-size: 15px; }
+    html:root .searchbar a::before { height: 34px; line-height: 34px; width: 30px; }
+    html:root .searchbar input { height: 34px; font-size: 14px; }
+    html:root .searchbar input::placeholder { color: var(--fm-muted); opacity: 1; }
+    html:root #messagelist td { padding-top: 10px; padding-bottom: 10px; }
+    /* Rows align cleanly with the search bar above; no dead left or right gutter. */
+    html:root #messagelist td.subject { position: relative; padding-left: 18px; padding-right: 16px; }
+    html:root #messagelist td.subject span { line-height: 20px; }
+    html:root #messagelist td.subject span.subject { font-size: 13px; padding-right: 26px; margin-top: 2px; }
+    html:root #messagelist td.subject span.subject a { color: var(--fm-text); }
+    html:root #messagelist td.subject :is(span.fromto, span.date, span.size) { color: var(--fm-muted); font-size: 12.5px; }
+    html:root #messagelist tr:not(.flagged):not(.deleted) td.subject :is(span.fromto, span.date, span.size) { color: var(--fm-muted); }
+    html:root #messagelist td.subject span.fromto { padding-left: 0; }
+    /* The mark is a gutter, not an indent: it never shifts the text it belongs to. */
+    html:root #messagelist td.subject .msgicon.status {
+        position: absolute; right: 16px; left: auto; top: 50%; transform: translateY(-50%);
+        width: 16px; height: var(--fm-line-base); line-height: var(--fm-line-base); text-align: right;
+    }
+    html:root #messagelist td.subject .msgicon.status::before { margin-right: 0; }
+    html:root #messagelist tr.unread td { background: var(--fm-unread); }
+    /* Read rows keep clear internal hierarchy; unread rows stay bright white. */
+    html:root #messagelist tr:not(.unread) td.subject :is(span.fromto, span.subject a) { color: var(--fm-read-text); font-weight: 400; }
+    html:root #messagelist tr:not(.unread) td.subject :is(span.date, span.size) { color: var(--fm-muted); font-weight: 400; }
+    html:root #messagelist tr.unread td.subject :is(span.fromto, span.subject a, span.date, span.size) { color: var(--fm-unread-text); font-weight: 600; }
+    html:root #messagelist tr.unread td.subject .fezadan-snippet { color: var(--fm-text); font-weight: 400; }
+    html:root #messagelist tr:hover td { background: var(--fm-hover); }
+    html:root #messagelist tr.selected { border-bottom-color: transparent; }
+    html:root #messagelist tr.selected td,
+    html:root #messagelist tr.selected:hover td { background: var(--fm-row-selected); color: var(--fm-selected-text); }
+    html:root #messagelist tr.selected td.subject :is(span.fromto, span.subject a, span.date, span.size),
+    html:root #messagelist tr.selected td.flags,
+    html:root #messagelist tr.selected td.flags span,
+    html:root #messagelist tr.selected td.threads > div,
+    html:root #messagelist tr.selected td.subject .msgicon.status.unread::before { color: var(--fm-selected-text) !important; }
+    html:root #messagelist tr.selected td.subject .fezadan-snippet { color: var(--fm-selected-muted) !important; }
+    html:root #messagelist tr.selected .fezadan-row-actions button { color: var(--fm-selected-text); }
+    html:root #messagelist tr.selected .fezadan-row-actions button:hover { background: rgba(255, 255, 255, .16); }
+    /* Real text previews, never HTML or an extra sortable column. Narrow screens
+       keep sender/subject readable rather than squeezing a desktop row onto a phone. */
+    html:root #messagelist .fezadan-snippet { display: block; clear: both; padding-left: 0; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fm-muted); font-size: var(--fm-text-sm); font-weight: 400; line-height: 18px; }
+    html:root #messagelist tr.unread td.subject span.fromto { color: var(--fm-unread-text); font-weight: 600; }
+    html:root #messagelist tr.unread td.subject .fezadan-snippet { font-weight: 400; }
+    /* Row actions replace Elastic's floating size/flag/delete pill: they sit in
+       the date corner, never over text, and appear for hover and keyboard focus.
+       Each toggle is one slot holding its two state buttons, so the group keeps
+       the same width whether a message is read, flagged or deleted. */
+    html:root .listing-hover-menu { display: none !important; }
+    html:root #messagelist td.subject .fezadan-row-actions {
+        position: absolute; z-index: 1; top: 8px; right: 12px;
+        display: none; align-items: center; gap: 2px;
+    }
+    html:root:not(.touch) #messagelist tr:hover td.subject .fezadan-row-actions,
+    html:root:not(.touch) #messagelist tr:focus-within td.subject .fezadan-row-actions { display: flex; }
+    html:root:not(.touch) #messagelist tr:hover td.subject > :is(.date, .size),
+    html:root:not(.touch) #messagelist tr:focus-within td.subject > :is(.date, .size),
+    html:root:not(.touch) #messagelist tr:hover td.subject .msgicon.status,
+    html:root:not(.touch) #messagelist tr:focus-within td.subject .msgicon.status,
+    html:root:not(.touch) #messagelist tr:hover td.flags > span,
+    html:root:not(.touch) #messagelist tr:focus-within td.flags > span { visibility: hidden; }
+    html:root .fezadan-row-action-slot { position: relative; width: 26px; height: 26px; }
+    html:root .fezadan-row-actions button {
+        display: none; align-items: center; justify-content: center;
+        width: 26px; height: 26px; padding: 0; border: 0; border-radius: var(--fm-radius-sm);
+        background: transparent; color: var(--fm-muted); cursor: pointer;
+    }
+    html:root .fezadan-row-action-slot > button { position: absolute; inset: 0; }
+    html:root .fezadan-row-actions button:hover { color: var(--fm-text); background: var(--fm-hover); }
+    html:root .fezadan-row-actions button::before { font-family: Icons; font-size: 13px; font-weight: 900; line-height: 1; }
+    html:root .fezadan-row-actions .act-archive { display: inline-flex; }
+    html:root .fezadan-row-actions .act-archive::before { content: "\f187"; }
+    html:root .fezadan-row-actions .act-read::before { content: "\f2b6"; font-weight: 400; }
+    html:root .fezadan-row-actions .act-unread::before { content: "\f0e0"; }
+    html:root .fezadan-row-actions .act-flag::before { content: "\f024"; }
+    html:root .fezadan-row-actions .act-unflag::before { content: "\f024"; font-weight: 400; }
+    html:root .fezadan-row-actions .act-delete::before { content: "\f2ed"; }
+    html:root .fezadan-row-actions .act-undelete::before { content: "\f01e"; }
+    html:root #messagelist tr.unread .fezadan-row-actions .act-read { display: inline-flex; }
+    html:root #messagelist tr:not(.unread) .fezadan-row-actions .act-unread { display: inline-flex; }
+    html:root #messagelist tr.flagged .fezadan-row-actions .act-unflag { display: inline-flex; }
+    html:root #messagelist tr:not(.flagged) .fezadan-row-actions .act-flag { display: inline-flex; }
+    html:root #messagelist tr.deleted .fezadan-row-actions .act-undelete { display: inline-flex; }
+    html:root #messagelist tr:not(.deleted) .fezadan-row-actions .act-delete { display: inline-flex; }
+    html:root .fezadan-reading-actions { display: flex; flex-wrap: wrap; gap: var(--fm-space-2); margin: 0 0 var(--fm-space-5); padding: 0 0 var(--fm-space-4); border-bottom: 1px solid var(--fm-border); }
+    html:root .fezadan-reading-actions .btn { min-height: 44px; padding: 10px 18px; font-size: 14px; }
+    html:root .action-preview #message-header, html:root .action-show #message-header {
+        padding: 24px 24px 18px;
+        border-bottom: 1px solid var(--fm-border);
+    }
+    html:root .message-part { overflow-wrap: anywhere; }
+    /* A quiet leading marker distinguishes keyboard focus without boxing the whole row. */
+    html:root #messagelist :is(tr, td):focus { outline: none !important; }
+    html:root #messagelist.focus tbody tr.focused > td:first-child,
+    html:root #messagelist.focus:not(.withselection) tbody tr.focused > td.selection + td {
+        border-left-color: var(--fm-focus);
+    }
+    /* Thread mode inserts an expander cell before the subject. Keep the actual
+       keyboard-focused subject visibly marked, not only that empty tree cell. */
+    html:root #messagelist.focus tbody tr.focused > td.subject { border-left: 2px solid var(--fm-focus); }
+    html:root #messagelist.focus tbody tr.focused.selected > td.subject { border-left-color: var(--fm-selected-text); }
+    html:root #messagelist.messagelist.focus:not(.withselection) tbody tr.focused > td.threads { border-left-color: transparent; }
+    html:root #messagelist td.subject span.msgicon.status.unread::before { color: var(--fm-accent); }
+    /* Read messages need no status dot; reply/forward glyphs keep their own marks. */
+    html:root #messagelist td.subject span.msgicon.status:not(.unread, .replied, .forwarded)::before { content: none; }
+    html:root #messagelist tr.flagged:not(.deleted) td { color: var(--fm-accent); }
+    html:root.touch #messagelist td.flags { background: transparent; }
+    html:root .listing-info { color: var(--fm-muted); font-weight: 400; }
+    /* The row box and separator stay stable at every pane width; only the
+       four-column split waits for a genuinely wide list. A small viewport with
+       two narrow columns would otherwise clip every field. */
+    html:root #messagelist-content { container: fezadan-list / inline-size; scrollbar-gutter: stable; }
+    /* The subject uses flex/grid while native flag/tree cells use table sizing.
+       Give widescreen rows one shared box and one separator, including on touch
+       screens. Never override the display:none used for collapsed thread rows. */
+    html:root #messagelist[data-fezadan-layout="widescreen"] { display: block; width: 100%; }
+    html:root #messagelist[data-fezadan-layout="widescreen"] tbody { display: block; }
+    html:root #messagelist[data-fezadan-layout="widescreen"] tbody > tr { display: flex; align-items: stretch; width: 100%; border-bottom: 1px solid var(--fm-border); }
+    html:root #messagelist[data-fezadan-layout="widescreen"] tbody > tr[style*="table-row"] { display: flex !important; }
+    html:root #messagelist[data-fezadan-layout="widescreen"] td { flex: 0 0 auto; border-bottom: 0; }
+    html:root #messagelist[data-fezadan-layout="widescreen"] td.threads { position: relative; width: 0; padding: 0; overflow: visible; }
+    html:root #messagelist[data-fezadan-layout="widescreen"] td.threads > div {
+        position: absolute; left: 3px; top: 10px;
+        width: 14px; height: 20px; display: flex; align-items: center; justify-content: center;
+        z-index: 2; cursor: pointer; color: var(--fm-muted);
+    }
+    html:root #messagelist[data-fezadan-layout="widescreen"] td.subject { flex: 1 1 auto; min-width: 0; width: auto; border-left: 2px solid transparent; }
+    html:root #messagelist[data-fezadan-layout="widescreen"] td.flags {
+        position: relative; width: 0; padding: 0; overflow: visible;
+    }
+    html:root #messagelist[data-fezadan-layout="widescreen"] td.flags > span {
+        position: absolute; right: 16px; width: 18px; height: 20px; line-height: 20px; text-align: center;
+    }
+    html:root #messagelist[data-fezadan-layout="widescreen"] td.flags > span.attachment { bottom: 10px; }
+    html:root #messagelist[data-fezadan-layout="widescreen"] td.flags > span.flag { top: 8px; }
+    html:root #messagelist[data-fezadan-layout="widescreen"] tr.fezadan-has-attachment td.subject .msgicon.status,
+    html:root #messagelist[data-fezadan-layout="widescreen"] tr.flagged td.subject .msgicon.status { right: 38px; }
+    html:root #messagelist[data-fezadan-layout="widescreen"] tr.fezadan-has-attachment td.subject span.subject { padding-right: 48px; }
+    /* A stable footer, not a row of stretched icons and a clipped text field. */
+    html:root #layout-list > .pagenav { flex: 0 0 52px; min-height: 52px; height: auto; line-height: 1; gap: 2px; padding: 4px 8px !important; background: var(--fm-bg); }
+    html:root #layout-list > .pagenav a { flex: 0 0 32px; min-width: 32px !important; height: 44px; line-height: 44px; border-radius: 5px; }
+    html:root #layout-list > .pagenav a::before { font-size: 14px; line-height: 44px; }
+    html:root #layout-list > .pagenav .pagenav-text { flex: 1 1 auto; min-width: 0; padding-left: 12px; font-size: 12px; font-weight: 400; line-height: 20px; color: var(--fm-muted); text-align: left; font-variant-numeric: tabular-nums; }
+    html:root #layout-list > .pagenav input { flex: 0 0 40px; width: 40px; max-width: none; height: 32px; max-height: none; padding: 4px; margin: 0 6px; font-size: 12px; line-height: 20px; font-variant-numeric: tabular-nums; background: var(--fm-field); border-color: transparent; appearance: textfield; -moz-appearance: textfield; }
+    html:root #layout-list > .pagenav input:focus { border-color: var(--fm-focus); }
+    html:root #layout-list > .pagenav input::-webkit-inner-spin-button,
+    html:root #layout-list > .pagenav input::-webkit-outer-spin-button { margin: 0; -webkit-appearance: none; }
+    html:root #layout-list > .pagenav input:disabled { color: var(--fm-muted); background: transparent; border-color: transparent; opacity: 1; }
+    html:root :is(.popover, .ui-dialog, .listing-hover-menu) {
+        background: var(--fm-bg);
+        color: var(--fm-text);
+        border: 1px solid var(--fm-border);
+        border-radius: 8px;
+        box-shadow: none;
+    }
+    html:root :is(.popover-header, .ui-dialog-titlebar) { background: var(--fm-side); color: var(--fm-text); border-color: var(--fm-border); }
+    html:root .popupmenu .listing li > a:not(.disabled):hover { color: var(--fm-text); background: var(--fm-hover); }
+    html:root :is(input, textarea, select, .form-control, .custom-select, .input-group-text, .recipient-input) {
+        background-color: var(--fm-field);
+        color: var(--fm-text);
+        /* A field boundary must stay visible at 3:1, not only as a faint tint. */
+        border-color: var(--fm-border-strong);
+        border-radius: var(--fm-radius-sm);
+    }
+    html:root :is(input, textarea, .form-control):focus { background-color: var(--fm-field); color: var(--fm-text); border-color: var(--fm-focus); box-shadow: none; }
+    /* Elastic's dark selectors also contain :not(.is-invalid). Match that specificity. */
+    html:root :is(.form-control, .custom-file-label):not(.is-invalid) { color: var(--fm-text); border-color: var(--fm-border-strong); }
+    html:root :is(.form-control, .custom-file-label):focus:not(.is-invalid) { border-color: var(--fm-focus); }
+    html:root .recipient-input.focus { background: var(--fm-field); border-color: var(--fm-focus); }
+    html:root .recipient-input :is(input, a.button.icon) { color: var(--fm-text); }
+    html:root .recipient-input .recipient { background: var(--fm-selected); border-color: var(--fm-border); }
+    html:root .btn { min-height: 40px; border-radius: 6px; box-shadow: none !important; }
+    html:root .btn-primary { color: var(--fm-primary-text); background: var(--fm-primary); border-color: var(--fm-primary); }
+    html:root .btn-primary:is(:hover, :focus):not(:disabled) { color: var(--fm-primary-text); background: var(--fm-primary); border-color: var(--fm-primary); opacity: .9; }
+    html:root .btn-primary:disabled { color: var(--fm-muted); background: var(--fm-selected); border-color: var(--fm-border); opacity: 1; }
+    html:root .btn-secondary { color: var(--fm-text); background: var(--fm-hover); border-color: var(--fm-border-strong); }
+    html:root .btn-secondary:is(:hover, :focus):not(:disabled) { color: var(--fm-text); background: var(--fm-selected); border-color: var(--fm-border-strong); }
+    html:root :is(.custom-switch, .custom-checkbox) .custom-control-label::before { background: var(--fm-field); border-color: var(--fm-border-strong); box-shadow: none; }
+    html:root :is(.custom-switch, .custom-checkbox) .custom-control-input:checked ~ .custom-control-label::before { background: var(--fm-primary); border-color: var(--fm-primary); }
+    html:root .custom-switch .custom-control-label::after { background: var(--fm-muted); }
+    html:root .custom-switch .custom-control-input:checked ~ .custom-control-label::after { background: var(--fm-primary-text); }
+    html:root .custom-control-input:focus ~ .custom-control-label::before { border-color: var(--fm-focus); box-shadow: 0 0 0 2px var(--fm-focus); }
+    html:root .ui-dialog .ui-dialog-buttonpane { background: var(--fm-side); border-color: var(--fm-border); }
+    html:root .ui-dialog .ui-dialog-content { color: var(--fm-text); background: var(--fm-content); }
+    html:root .ui-dialog .ui-dialog-title { color: var(--fm-text); }
+    html:root .ui-dialog :is(.ui-dialog-titlebar-close, .btn-link) { color: var(--fm-muted); }
+    /* Native jQuery UI buttons keep the light-theme halo without this reset. */
+    html:root .ui-dialog .ui-button { box-shadow: none; }
+    html:root .ui-dialog-titlebar-close { border: 0; background: transparent; }
+    html:root #mailtoprotohandler { text-decoration: underline; text-underline-offset: 2px; }
+    html:root :is(.html-editor .editor-toolbar, .tox .tox-toolbar, .tox .tox-toolbar__primary) { color: var(--fm-text); background: var(--fm-side); border-color: var(--fm-border); }
+    html:root .html-editor .editor-toolbar .mce-i-html { color: var(--fm-muted); }
+    html:root .tox.tox-tinymce { border-color: var(--fm-border); border-radius: 6px; }
+    html:root .tox.tox-tinymce.focused { border-color: var(--fm-focus) !important; box-shadow: none !important; }
+    html:root .tox .tox-toolbar-overlord > div { background: var(--fm-side); border-color: var(--fm-border); }
+    html:root .tox .tox-editor-header { box-shadow: none; }
+    html:root .tox :is(.tox-tbtn, .tox-split-button, .tox-swatches__picker-btn) { color: var(--fm-text); font-family: inherit; }
+    html:root .tox :is(.tox-tbtn, .tox-split-button) svg { fill: var(--fm-text) !important; }
+    html:root .tox :is(.tox-tbtn, .tox-split-button):is(:hover, :focus),
+    html:root .tox .tox-tbtn--enabled { color: var(--fm-text); background: var(--fm-hover); box-shadow: none; }
+    html:root .tox .tox-toolbar__group:not(:last-of-type) { border-color: var(--fm-border); }
+    html:root .tox :is(.tox-dialog, .tox-dialog__header, .tox-dialog__body, .tox-dialog__footer, .tox-menu) { color: var(--fm-text); background: var(--fm-bg); border-color: var(--fm-border); box-shadow: none; }
+    html:root .tox :is(.tox-label, .tox-dialog__title, .tox-textfield, .tox-collection__item) { color: var(--fm-text); font-family: "Inter", system-ui, sans-serif; }
+    html:root .tox .tox-dialog__footer .tox-button { color: var(--fm-primary-text); background: var(--fm-primary); border-color: var(--fm-primary); border-radius: 6px; }
+    html:root .tox .tox-dialog__footer .tox-button--secondary { color: var(--fm-text); background: var(--fm-hover); border-color: var(--fm-border); }
+    html:root :is(.nav-tabs, .nav-tabs .nav-link.active) { border-color: var(--fm-border); }
+    html:root .nav-tabs .nav-link { color: var(--fm-muted); }
+    html:root .nav-tabs .nav-link.active { color: var(--fm-text); background: var(--fm-field); }
+    html:root .formcontainer { background: var(--fm-content); color: var(--fm-text); }
+    html:root :is(.formcontent .hint, .file-upload .hint, .listing span.secondary, .contactlist span.email) { color: var(--fm-muted); }
+    html:root :is(input, textarea)::placeholder { color: var(--fm-muted); opacity: 1; }
+    html:root .file-upload { border-color: var(--fm-border-strong); }
+    html:root :is(.formcontent legend, .formcontent .col-form-label, .propform label) { color: var(--fm-text); }
+    html:root #compose-content .formcontent { padding: 24px; }
+    html:root #compose-content .formbuttons { background: var(--fm-content); border-color: var(--fm-border); padding: 14px 24px; }
+    /* The native send control stays the only handler. It is hidden only while
+       the MUI island's host is present, so an Elastic re-render restores it. */
+    html:root .formbuttons:has(.fezadan-send-host) > button.send { display: none; }
+    /* Phone footer cell: same box as Elastic's stacked icon+label buttons. */
+    html:root .footer.menu span.buttons > .fezadan-send-host { display: block; flex: 0 1 auto; padding: 6px; }
+    html:root .footer.menu .fezadan-send-host .MuiButton-root {
+        display: flex; flex-direction: column; justify-content: center; gap: 2px;
+        width: 100%; height: 100%; min-width: 0; padding: 0; font-size: .9rem; line-height: 1.2;
+    }
+    html:root .footer.menu .fezadan-send-host .MuiButton-startIcon { margin: 0; }
+    html:root .footer.menu .fezadan-send-host .MuiSvgIcon-root { font-size: 1.25rem; }
+    html:root .footer.menu span.buttons:has(.fezadan-send-host) > a.send { display: none; }
+    /* Content/list toolbar: MUI icon buttons on wide screens, Elastic's own
+       labelled popup list on small screens (the same nodes are reused there). */
+    @media (min-width: 1024px) {
+        html:root #toolbar-menu > li:has(> .fezadan-tool-host) > a,
+        html:root #toolbar-list-menu > li:has(> .fezadan-tool-host) > a { display: none; }
+    }
+    html:root .fezadan-tool-host { display: inline-flex; align-items: center; }
+    html:root .fezadan-tool-host .MuiIconButton-root { width: 32px; height: 32px; border-radius: 8px; }
+    html:root .fezadan-tool-host .MuiSvgIcon-root { font-size: 20px; }
+    html:root #composebody { padding: 18px; font-family: inherit; font-size: 15px; line-height: 1.65; }
+    /* One writing surface. Secondary delivery/formatting controls stay available
+       without competing with the recipient, subject, message and Send action. */
+    .fezadan-compose-heading { margin: 0 0 24px; font-size: 22px; font-weight: 600; letter-spacing: -.02em; }
+    .fezadan-compose-options, .fezadan-compose-tools { border-top: 1px solid var(--fm-border); margin-top: 16px; }
+    .fezadan-compose-options > summary, .fezadan-compose-tools > summary { display: flex; align-items: center; justify-content: space-between; min-height: 44px; cursor: pointer; font-weight: 500; list-style: none; }
+    .fezadan-compose-options > summary::after, .fezadan-compose-tools > summary::after { content: '+'; margin-left: 12px; }
+    .fezadan-compose-options[open] > summary::after, .fezadan-compose-tools[open] > summary::after { content: '−'; }
+    .fezadan-compose-options > summary::-webkit-details-marker, .fezadan-compose-tools > summary::-webkit-details-marker { display: none; }
+    .fezadan-compose-tools { margin: 8px 0 16px; }
+    html:root .fezadan-compose-tools .menu { background: transparent; }
+    html:root .fezadan-compose-tools a { color: var(--fm-text); }
+    html:root .fezadan-compose-tools a.disabled { opacity: .5; }
+    html:root .fezadan-recipient-options::before, .fezadan-recipient-options .inner { display: none !important; }
+    html:root .fezadan-recipient-options { min-width: 72px; font-size: 12px; white-space: nowrap; }
+    html:root .action-compose #compose-attachments { min-height: 0; padding: 16px; border: 1px dashed var(--fm-border); }
+    html:root .action-compose #compose-attachments::before, html:root .action-compose #compose-attachments::after { display: none; }
+    html:root .action-compose #compose-attachments .upload-form { margin: 0; }
+    html:root .action-compose #compose-attachments .hint { font-size: 12px; line-height: 1.5; margin-bottom: 12px; }
+    html:root .action-compose #compose-content > form { width: min(100%, 980px); margin-inline: auto; }
+    html:root .action-compose #composebody { min-height: 280px; background: var(--fm-bg); }
+    html:root .action-compose #compose-options { padding-top: 12px; }
+    html:root .action-compose #layout-content .formbuttons .send { min-width: 110px; }
+    html:root .action-compose #toolbar-menu a.draft { width: auto; min-width: 96px; }
+    html:root .action-compose #toolbar-menu a.draft .inner { width: auto; max-width: none; }
+    /* Attachments read as removable chips, not a second form field. */
+    html:root .attachmentslist { display: flex; flex-wrap: wrap; gap: var(--fm-space-2); padding: var(--fm-space-2) 0; background: transparent; border: 0; border-radius: 0; }
+    html:root .attachmentslist li { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 6px 10px; background: var(--fm-field); border: 1px solid var(--fm-border); border-radius: 999px; }
+    html:root .attachmentslist li a.filename { flex: 1 1 auto; min-width: 0; overflow: hidden; }
+    html:root .attachmentslist li .attachment-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    html:root .attachmentslist li .attachment-size { flex: 0 0 auto; white-space: nowrap; }
+    html:root .attachmentslist a { color: var(--fm-text); }
+    /* A transient status must not sit on top of the compose action bar. */
+    html:root .task-mail.action-compose #messagestack { bottom: 80px; }
+    html:root #message-header { padding: 20px; border-bottom: 1px solid var(--fm-border); }
+    html:root #message-header > .subject {
+        display: flex; align-items: baseline; gap: 8px; margin: 0 0 16px;
+        font-size: 21px; line-height: 1.35; font-weight: 600; letter-spacing: -.02em; overflow-wrap: anywhere;
+    }
+    html:root #message-header > .subject a.extwin { flex: 0 0 auto; color: var(--fm-muted); }
+    html:root #message-header > .subject a.extwin:hover { color: var(--fm-text); }
+    html:root #message-header > .subject a.extwin::before { margin: 0; font-size: 13px; line-height: 1; vertical-align: 0; }
+    html:root #message-header .header { align-items: flex-start; gap: 12px; }
+    html:root #message-header .header .contactphoto {
+        flex: 0 0 40px; width: 40px; height: 40px; margin: 0; background: var(--fm-field);
+    }
+    html:root #message-header .header-content {
+        display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "summary links" "headers links";
+        align-content: start; align-items: start; column-gap: 12px; min-height: 40px;
+    }
+    html:root #message-header .header-summary { grid-area: summary; margin: 1px 0 0; color: var(--fm-muted); font-size: 13px; line-height: 1.6; }
+    html:root #message-header .header-summary .rcmContactAddress { color: var(--fm-text); font-weight: 600; text-decoration: none; }
+    html:root #message-header .header-summary .rcmContactAddress:hover { text-decoration: underline; text-underline-offset: 2px; }
+    html:root #message-header .header-summary .text-nowrap { color: var(--fm-muted); font-variant-numeric: tabular-nums; }
+    /* The native header links stay quiet text buttons at the top right. */
+    html:root #message-header .header-links { grid-area: links; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 2px; margin: -4px -8px 0 0; }
+    html:root #message-header .header-links a {
+        display: inline-flex; align-items: center; min-height: 28px; margin: 0; padding: 0 8px;
+        border-radius: 6px; color: var(--fm-muted); font-size: 12px; line-height: 1;
+        text-decoration: none; white-space: nowrap;
+    }
+    html:root #message-header .header-links :is(.headers-details, .headers-summary, .headers-all, .plain, .html)::before { content: none; }
+    html:root #message-header .header-links a:hover { color: var(--fm-text); background: var(--fm-hover); }
+    html:root #message-header .header-headers { grid-area: headers; color: var(--fm-text); font-size: 13px; }
+    html:root #message-header .header-headers .header-title { padding-right: 12px; color: var(--fm-muted); font-weight: 500; }
+    /* Message HTML keeps its own colors; never invert a sender's content/images.
+       Unstyled links follow the surrounding text and an underline instead of the
+       chrome ink, which would disappear on a white part in dark mode. */
+    html:root :is(.message-part, .message-htmlpart) a {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+    html:root .message-part { line-height: 1.65; }
+    /* Elastic shows plain-text mail in a monospace face; read it in the interface font.
+       Code and quoted preformatted blocks inside HTML mail keep their own monospace.
+       The measure is capped so a long line does not run the full width of a wide pane. */
+    html:root .message-part div.pre { max-width: 68ch; font-family: inherit; font-size: 15px; }
+    /* Quotes and signatures are context, not a second color scheme. Elastic paints
+       nested quote levels blue, green and red; one quiet neutral rule is enough. */
+    html:root .message-part blockquote,
+    html:root .message-part blockquote blockquote,
+    html:root .message-part blockquote blockquote blockquote {
+        color: var(--fm-muted);
+        background: var(--fm-field);
+        border: 0;
+        border-left: 2px solid var(--fm-border-strong);
+        border-radius: 0 var(--fm-radius-sm) var(--fm-radius-sm) 0;
+        padding: var(--fm-space-1) var(--fm-space-3);
+        margin: var(--fm-space-2) 0;
+    }
+    html:root .message-part blockquote span.blockquote-link {
+        color: var(--fm-muted); background: var(--fm-bg);
+        border-color: var(--fm-border); border-radius: var(--fm-radius-sm);
+    }
+    html:root .message-part span.sig { color: var(--fm-muted); font-size: .95em; }
+    html:root #remote-objects-message {
+        color: var(--fm-text);
+        background: var(--fm-field);
+        border: 1px solid var(--fm-border);
+        border-radius: 6px;
+        opacity: 1;
+        padding: 16px;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+    html:root #remote-objects-message > i.icon { align-self: flex-start; margin-top: 3px; color: var(--fm-muted); }
+    html:root #remote-objects-message .fezadan-remote-copy { flex: 1 1 240px; min-width: 0; }
+    html:root #remote-objects-message .fezadan-remote-copy :is(strong, span) { display: block; margin: 0; }
+    html:root #remote-objects-message strong { font-size: 14px; line-height: 1.5; font-weight: 600; }
+    html:root #remote-objects-message .fezadan-remote-copy > span { color: var(--fm-muted); font-size: 13px; line-height: 1.6; margin-top: 4px; }
+    html:root #remote-objects-message .boxbuttons { display: block; white-space: normal; }
+    html:root #remote-objects-message .btn { max-width: none; white-space: normal; margin: 0; padding: 10px 12px; font-size: 13px; }
+
+    /* Login: one centred card on the quiet sidebar surface. */
+    html:root body.task-login { overflow: auto; }
+    html:root .task-login #layout { min-height: 100dvh; height: auto; }
+    html:root .task-login #layout-content { display: flex; min-height: 100dvh; text-align: left; background: var(--fm-side); padding: var(--fm-space-6) var(--fm-space-5); justify-content: center; align-items: center; }
+    .fezadan-login {
+        width: min(100%, 400px); margin: auto; padding: 40px var(--fm-space-6);
+        background: var(--fm-bg); border: 1px solid var(--fm-border);
+        border-radius: var(--fm-radius-lg);
+    }
+    .fezadan-login .fezadan-brand { display: flex; justify-content: center; margin-bottom: var(--fm-space-5); }
+    .fezadan-login .fezadan-brand .fezadan-logo { width: 30px; height: 26px; flex-basis: 30px; }
+    .fezadan-login h1 { font-size: var(--fm-text-2xl); line-height: 1.2; font-weight: 600; letter-spacing: -.02em; margin: 0 0 var(--fm-space-3); text-align: center; }
+    .fezadan-credit { display: flex; align-items: center; justify-content: center; gap: 8px; width: fit-content; margin: 28px auto 0; text-decoration: none !important; }
+    html:root .fezadan-credit { color: var(--fm-muted); }
+    html:root .fezadan-credit:hover { color: var(--fm-text); }
+    .fezadan-credit .fezadan-logo { flex-basis: 26px; width: 26px; height: 22px; }
+    .fezadan-credit-text { display: flex; flex-direction: column; line-height: 1.4; font-size: 11px; text-align: left; }
+    .fezadan-credit-text strong { color: var(--fm-text); font-size: 13px; font-weight: 600; }
+    .litecaptcha-check-row { border: 1px solid var(--fm-border); border-radius: 6px; padding: 12px 14px; margin-bottom: 12px; text-align: left; }
+    .litecaptcha-mini-brand { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; font-size: 11px; font-weight: 600; color: var(--fm-muted); }
+    .litecaptcha-mini-brand svg { width: 15px; height: 15px; }
+    .litecaptcha-check-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 32px; }
+    .litecaptcha-check-label { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 14px; cursor: pointer; }
+    html:root .task-login #login-form #litecaptcha-check { appearance: auto; position: static; opacity: 1; z-index: auto; width: 22px; height: 22px; flex: 0 0 22px; padding: 0; margin: 0; accent-color: var(--fm-text); cursor: pointer; }
+    #litecaptcha-status { color: var(--fm-muted); font-size: 11px; }
+    .litecaptcha-detail { margin-top: 8px; color: var(--fm-muted); font-size: 12px; line-height: 1.5; }
+    .litecaptcha-detail[hidden], .litecaptcha-page-btn[hidden] { display: none !important; }
+    .litecaptcha-bridge { position: fixed; width: 1px; height: 1px; left: -9999px; bottom: 0; border: 0; opacity: 0; pointer-events: none; }
+    html:root .litecaptcha-page-btn { position: fixed; z-index: 10000; min-width: 112px; min-height: 48px; padding: 10px 18px; border: 1px solid var(--fm-border); border-radius: 6px; background: var(--fm-text); color: var(--fm-bg); font: 600 14px Inter, sans-serif; cursor: pointer; touch-action: manipulation; }
+    html:root .task-login #login-form { width: 100%; max-width: none; top: auto; position: static; margin: 0; }
+    html:root .task-login #login-form table { width: 100%; }
+    html:root .task-login #login-form :is(tbody, tr, td) { display: block; width: 100%; }
+    html:root .task-login #login-form tr { margin: 0; }
+    html:root .task-login #login-form td.title { display: block !important; text-align: left; padding: 0 0 8px; font-size: 13px; }
+    html:root .task-login #login-form td.input { padding: 0 0 20px; }
+    html:root .task-login #login-form .input-group-prepend { display: none; }
+    html:root .task-login #login-form input { width: 100%; height: 46px; font-size: 16px; padding: 10px 12px; border-radius: 6px !important; }
+    html:root .task-login #login-form .btn { width: 100%; height: 46px; font-size: 15px; margin: 8px 0 0; text-transform: none !important; }
+    html:root .task-login #login-footer { margin: 24px 0 0; color: var(--fm-muted); text-align: left; }
+
+    @media (min-width: 1025px) {
+        html:root .action-compose #layout-sidebar { width: 260px !important; min-width: 260px; max-width: 260px; }
+        html:root #layout-menu { width: 216px; }
+        html:root #layout-menu .popover-header { display: flex; align-items: center; justify-content: flex-start; padding: 0 16px !important; }
+        html:root #taskmenu { padding: 0 12px; }
+        html:root #taskmenu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            max-width: none;
+            height: 40px;
+            padding: 0 12px;
+            margin: 2px 0;
+            text-align: left;
+        }
+        html:root #taskmenu a::before { width: 20px !important; height: 20px !important; font-size: 16px; line-height: 20px; margin: 0 !important; }
+        html:root #taskmenu span.inner { display: inline; padding: 0; font-size: 14px; }
+        html:root #taskmenu .action-buttons { display: block; padding: 4px 0 16px; }
+        html:root #taskmenu .action-buttons a { height: 44px; }
+        html:root #taskmenu .action-buttons .inner { font-weight: 600; }
+        html:root #taskmenu .special-buttons {
+            position: fixed; z-index: 2; bottom: 0; left: 0; width: 215px;
+            padding: 8px 12px 12px; background: var(--fm-side) !important;
+            border-top: 1px solid var(--fm-border);
+        }
+        html:root #layout-sidebar { max-width: 24%; min-width: 200px; }
+        html:root #layout-list { max-width: 40%; min-width: 320px; }
+    }
+    @media (min-width: 769px) {
+        /* Reader toolbar: Elastic flattens #mailtoolbar into this ul. Icon commands
+           with tooltips keep every plugin action visible; centered, the row was
+           clipped at both edges as soon as a few buttons had labels. */
+        html:root #layout-content > .header:has(> #toolbar-menu) { justify-content: flex-start; }
+        html:root #layout-content > .header > #toolbar-menu {
+            display: flex; align-items: center; gap: 2px; flex: 0 1 auto; min-width: 0;
+            margin: 0 8px; overflow: hidden; text-align: left;
+        }
+        html:root #layout-content > .header > #toolbar-menu > li { display: flex; align-items: center; flex: 0 0 auto; height: auto; border-bottom: 0; }
+        html:root #layout-content > .header > #toolbar-menu .inner { display: none !important; }
+        html:root #layout-content > .header > #toolbar-menu a {
+            display: flex; align-items: center; justify-content: center;
+            float: none; width: 36px; min-width: 36px; max-width: none; height: 36px;
+            padding: 0; border-radius: 6px; font-size: 13px; line-height: 36px;
+        }
+        html:root #layout-content > .header > #toolbar-menu a::before { width: auto !important; height: 36px !important; margin: 0 !important; font-size: 17px; line-height: 36px; }
+        html:root #layout-content > .header > #toolbar-menu span.dropbutton { display: flex; align-items: center; }
+        html:root #layout-content > .header > #toolbar-menu span.dropbutton > a.dropdown { width: 20px; min-width: 20px; padding: 0; }
+        html:root #layout-content > .header > #toolbar-menu span.dropbutton > a.dropdown::before { font-size: 10px; }
+        html:root #layout-content > .header > #toolbar-menu > li.spacer { flex: 0 0 8px; width: 8px; }
+        /* One icon-button size for the list header and its menu actions. */
+        html:root #messagelist-header .toolbar a,
+        html:root #messagelist-header > :is(.refresh, .toolbar-menu-button, .toolbar-list-button) { width: 36px; min-width: 36px; height: 36px; margin: 0 1px; border-radius: 6px; }
+        html:root #messagelist-header .toolbar a::before,
+        html:root #messagelist-header > :is(.refresh, .toolbar-menu-button, .toolbar-list-button)::before { height: 36px; line-height: 36px; font-size: 16px; }
+        /* Contacts and settings repeat the mail sidebar's section header so the
+           three columns start with the same small, left-aligned label. */
+        html:root :is(.task-addressbook, .task-settings) #layout-sidebar > .header {
+            display: flex; align-items: center; height: 30px; min-height: 30px;
+            padding: 0 8px; border: 0;
+        }
+        html:root :is(.task-addressbook, .task-settings) #layout-sidebar > .header .header-title {
+            flex: 1 1 auto; margin: 0 !important; padding: 0 0 0 12px;
+            text-align: left; color: var(--fm-muted); font-size: var(--fm-text-sm); font-weight: 600;
+            line-height: 30px;
+        }
+        html:root :is(.task-addressbook, .task-settings) #layout-sidebar > .header a.button {
+            display: flex; align-items: center; justify-content: center;
+            width: 30px; min-width: 30px; height: 30px; margin: 0;
+        }
+        html:root :is(.task-addressbook, .task-settings) #layout-sidebar > .header a.button::before { height: 30px; line-height: 30px; }
+        /* Desktop shows the group list beside the mail, so the mobile back
+           affordance has no destination here. */
+        html:root :is(.task-addressbook, .task-settings) #layout-sidebar > .header a.back-list-button,
+        html:root :is(.task-addressbook, .task-settings) #layout-sidebar > .header a.task-menu-button { display: none; }
+    }
+    @media (min-width: 1201px) {
+        /* One visual sidebar. All native IDs/objects stay in the DOM for Elastic. */
+        html:root .task-mail.action-none #layout {
+            display: grid;
+            grid-template-columns: 216px var(--fm-list-width, minmax(360px, .72fr)) minmax(360px, 1.28fr);
+            grid-template-rows: auto minmax(0, 1fr);
+        }
+        html:root .task-mail.action-none #layout-menu { grid-column: 1; grid-row: 1; width: auto; padding-bottom: 14px; }
+        html:root .task-mail.action-none #layout-sidebar { grid-column: 1; grid-row: 2; width: auto !important; min-width: 0; max-width: none; padding-bottom: 100px; }
+        html:root .task-mail.action-none #layout-sidebar > .header { display: flex; align-items: center; justify-content: flex-end; height: 30px; min-height: 30px; line-height: 30px; border: 0; padding: 0 8px; }
+        /* The folder actions button had no visible owner; this names the list. */
+        html:root .task-mail.action-none #layout-sidebar > .header::before {
+            content: "Folders"; margin-right: auto; padding-left: var(--fm-space-2);
+            color: var(--fm-muted); font-size: var(--fm-text-sm); font-weight: 600;
+        }
+        /* Elastic repeats the mailbox address here; the account switcher above
+           already shows it, so this row is only the folder actions. */
+        html:root .task-mail.action-none #layout-sidebar > .header .username { display: none; }
+        html:root .task-mail.action-none #layout-sidebar > .header .sidebar-menu { flex: 0 0 28px; width: 28px; min-width: 28px; height: 28px; border-radius: 6px; }
+        html:root .task-mail.action-none #layout-sidebar > .header .sidebar-menu::before { height: 28px; line-height: 28px; font-size: 14px; }
+        html:root .task-mail.action-none #layout-list { position: relative; grid-column: 2; grid-row: 1 / -1; max-width: none; min-width: 0; width: auto !important; }
+        html:root .task-mail.action-none #layout-content { grid-column: 3; grid-row: 1 / -1; }
+        html:root .task-mail.action-none .column-resizer { display: none; }
+        html:root .task-mail.action-none .fezadan-list-resizer {
+            position: absolute; top: 0; right: -4px; bottom: 0; width: 8px; z-index: 20;
+            cursor: col-resize; touch-action: none;
+        }
+        html:root .task-mail.action-none .fezadan-list-resizer::after {
+            content: ""; position: absolute; top: 0; bottom: 0; left: 3px; width: 2px;
+            background: transparent; transition: background-color 120ms ease;
+        }
+        html:root .task-mail.action-none .fezadan-list-resizer:hover::after,
+        html:root body.fezadan-resizing .fezadan-list-resizer::after { background: var(--fm-row-selected); }
+        html:root body.fezadan-resizing { cursor: col-resize; user-select: none; }
+        html:root body.fezadan-resizing #messagecontframe { pointer-events: none; }
+        html:root #messagelist-header .header-title { display: block !important; text-align: left; margin: 0 !important; padding: 0 16px !important; font-size: 17px; font-weight: 600; }
+        html:root #messagelist-header .toolbar { margin-left: auto; }
+        /* Elastic forces toolbar labels visible; keep this desktop header compact. */
+        html:root #messagelist-header :is(.toolbar, .refresh) span.inner { display: none !important; }
+        @container fezadan-list (min-width: 640px) {
+            html:root #messagelist[data-fezadan-layout="widescreen"] td { padding-block: 10px; line-height: 20px; }
+            html:root #messagelist[data-fezadan-layout="widescreen"] td.threads > div { top: 50%; transform: translateY(-50%); }
+            html:root #messagelist[data-fezadan-layout="widescreen"] td.flags { position: static; width: auto; padding: 0; display: flex; align-items: center; }
+            html:root #messagelist[data-fezadan-layout="widescreen"] td.flags > span { position: static; display: none; width: 20px; height: 20px; line-height: 20px; }
+            html:root #messagelist[data-fezadan-layout="widescreen"] tr.fezadan-has-attachment td.flags > span.attachment,
+            html:root #messagelist[data-fezadan-layout="widescreen"] tr.flagged td.flags > span.flag { display: inline-block; margin-right: 10px; }
+            /* A fixed date box keeps every row's columns aligned; a content-sized one
+               let each row's date length shift the sender/subject/snippet sideways. */
+            html:root #messagelist[data-fezadan-layout="widescreen"] td.subject { display: grid; grid-template-columns: minmax(88px, 1fr) minmax(0, 1.6fr) minmax(0, 1fr) 92px; grid-template-areas: "sender title snippet date"; align-items: center; column-gap: 12px; padding-left: 18px; padding-right: 16px; }
+            /* The unread mark sits in its own space just before the date column. */
+            html:root #messagelist[data-fezadan-layout="widescreen"] tr td.subject .msgicon.status { right: 98px; }
+            html:root #messagelist[data-fezadan-layout="widescreen"] tr td.subject span.subject { padding-right: 0; margin-top: 0; }
+            html:root #messagelist[data-fezadan-layout="widescreen"] td.subject > span:not(.fezadan-row-actions) { position: static; float: none; padding: 0; margin: 0; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; line-height: 20px; }
+            html:root #messagelist[data-fezadan-layout="widescreen"] td.subject > span.fromto { grid-area: sender; font-size: 13px; }
+            html:root #messagelist[data-fezadan-layout="widescreen"] td.subject > span.subject { grid-area: title; display: flex; align-items: center; gap: 2px; font-size: 13px; }
+            html:root #messagelist[data-fezadan-layout="widescreen"] td.subject > span.date { grid-area: date; justify-self: end; font-size: 12px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+            html:root #messagelist[data-fezadan-layout="widescreen"] td.subject > .fezadan-snippet { grid-area: snippet; margin-top: 0; }
+            html:root #messagelist[data-fezadan-layout="widescreen"] td.subject > span.subject a { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+            html:root #messagelist[data-fezadan-layout="widescreen"] td.subject .msgicon { top: 50%; transform: translateY(-50%); }
+            html:root #messagelist[data-fezadan-layout="widescreen"] td.subject .msgicon::before { height: 20px; line-height: 20px; }
+            html:root #messagelist[data-fezadan-layout="widescreen"] td.subject .fezadan-row-actions { top: 50%; transform: translateY(-50%); right: 12px; }
+            html:root #messagelist[data-fezadan-layout="widescreen"] td.subject > :is(span.size, span.attachment) { display: none; }
+            html:root #messagelist[data-fezadan-layout="widescreen"] td.subject > span.folder { grid-column: 1 / -1; font-size: 11px; }
+            html:root #messagelist[data-fezadan-layout="widescreen"].sort-size td.subject > span.size { display: block; grid-area: date; justify-self: end; font-size: 12px; }
+            html:root #messagelist[data-fezadan-layout="widescreen"].sort-size td.subject > span.date { display: none; }
+        }
+    }
+    @media (min-width: 481px) and (max-width: 1024px) {
+        html:root #layout-menu { width: 60px; }
+        html:root #layout-menu .popover-header { display: flex; justify-content: center; align-items: center; }
+        html:root #layout-menu .fezadan-brand { flex-direction: column; gap: 6px; }
+        html:root #layout-menu .fezadan-logo { flex-basis: 18px; height: 18px; }
+        html:root #layout-menu .fezadan-mark { flex-basis: 20px; width: 20px; height: 20px; }
+        html:root #layout-menu .fezadan-brand-name { display: none; }
+        html:root #layout-menu .fezadan-accounts { display: none; }
+        html:root #taskmenu a { width: 59px; height: 52px; padding: 0; display: flex; align-items: center; justify-content: center; }
+        html:root #taskmenu a::before { line-height: 20px; }
+        html:root #taskmenu .action-buttons { display: block; padding: 4px; }
+        html:root #taskmenu .action-buttons a { width: 51px; height: 44px; }
+        html:root #taskmenu .special-buttons { width: 59px; }
+        html:root #layout-list { max-width: none; }
+    }
+    html:root.layout-normal .task-mail.action-none #layout-list { flex: 1 !important; max-width: none; }
+    html:root.layout-normal .task-mail.action-none #layout-content { flex: 1; }
+    @media (max-width: 768px) {
+        html:root #layout-list { max-width: none; }
+        html:root .menu.toolbar a { min-height: 44px; }
+        /* Reader actions are the primary touch controls in the message view. */
+        html:root .fezadan-reading-actions :is(.MuiButton-root, button.btn) { min-height: 44px; }
+        html:root #message-header .header-links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 8px; }
+        /* The native header already names the screen on phones; the in-form
+           heading would be the same words twice. */
+        html:root .fezadan-compose-heading { display: none; }
+        html:root #compose-content .formcontent { padding: 14px; }
+        html:root #compose-content .formbuttons { padding: 12px 14px; }
+        html:root body.task-mail .floating-action-buttons { bottom: calc(60px + env(safe-area-inset-bottom)); right: 16px; }
+        html:root .floating-action-buttons a.compose { width: auto; min-height: 48px; border-radius: 8px; padding: 0 18px; display: flex; align-items: center; gap: 10px; opacity: 1; }
+        html:root .floating-action-buttons a.compose span.inner { display: inline; font-size: 14px; font-weight: 600; }
+        html:root .floating-action-buttons a.compose::before { width: 20px; height: 48px; font-size: 16px; line-height: 48px; }
+        html:root .floating-action-buttons a.compose::before { content: "+"; font-family: "Inter", sans-serif; font-size: 24px; }
+        html:root #messagelist-content { padding-bottom: 80px; }
+        html:root .action-preview #message-header, html:root .action-show #message-header { padding: 16px; }
+        html:root #message-header > .subject { font-size: 19px; margin-bottom: 14px; }
+        html:root #message-header .header { gap: 10px; }
+        html:root #message-header .header .contactphoto { flex-basis: 36px; width: 36px; height: 36px; }
+        html:root #message-header .header-content { display: block; }
+        html:root #message-header .header-links { justify-content: flex-start; margin: 6px 0 0 -8px; }
+    }
+    @media (max-width: 480px) {
+        html:root #layout-list > .pagenav { padding-inline: 4px !important; gap: 0; }
+        html:root #layout-list > .pagenav a { flex-basis: 44px; min-width: 44px !important; min-height: 44px; }
+        html:root #layout-list > .pagenav .pagenav-text { font-size: 11px; }
+        /* Folder rows are touch targets too when the sidebar slides in. */
+        html:root #mailboxlist li > a { line-height: 44px; }
+        html:root .ui-dialog { border: 0; border-radius: 0; }
+        html:root #layout-menu { background: var(--fm-side); }
+        html:root #layout-menu .popover-header { justify-content: space-between; padding: 0 16px !important; }
+        html:root #taskmenu { padding: 8px 12px 16px; }
+        html:root #taskmenu a { min-height: 48px; padding: 0 12px; font-size: 15px; border: 0 !important; }
+        html:root #taskmenu .action-buttons { display: block; margin-bottom: 12px; }
+        html:root #taskmenu a.compose { display: flex; align-items: center; gap: 12px; }
+        html:root #taskmenu .special-buttons { position: static; display: block; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--fm-border); }
+        html:root #layout > div > .header a.button { min-width: 44px; min-height: 44px; }
+        html:root #layout > div > .header a.button::before { font-size: 20px; }
+        /* Phone search controls get a full touch target, not a 30px glyph. */
+        html:root .searchbar a { min-width: 44px; min-height: 44px; }
+        html:root .searchbar a::before { width: 44px; height: 44px; line-height: 44px; }
+        html:root .searchbar form, html:root .searchbar form::before { height: 44px; line-height: 44px; }
+        html:root .searchbar input { height: 44px; }
+        /* Compose controls become full-height touch rows on phones. */
+        html:root .action-compose #compose-content :is(input, select, .form-control) { min-height: 44px; }
+        html:root .action-compose #compose-content .input-group-text { min-width: 44px; min-height: 44px; }
+        html:root .action-compose #compose-content .fezadan-recipient-options { min-height: 44px; }
+        html:root #messagelist td { padding-top: 12px; padding-bottom: 12px; }
+        html:root #messagelist td.subject { padding-left: 14px; }
+        html:root .searchbar { padding: 8px 12px; }
+        html:root .task-login #layout-content { padding: var(--fm-space-5) var(--fm-space-4); }
+        .fezadan-login { padding: 28px 20px; }
+        .fezadan-login .fezadan-brand { margin-bottom: var(--fm-space-5); }
+        .fezadan-login h1 { font-size: 25px; }
+    }
+    /* Add-account dialog: the real login page runs in a same-origin iframe so
+       the CAPTCHA and session flow stay untouched; cancel returns to the mailbox. */
+    .fezadan-modal-backdrop {
+        position: fixed; inset: 0; z-index: 2000;
+        display: flex; align-items: center; justify-content: center;
+        padding: 20px; background: rgba(15, 15, 15, .55);
+    }
+    .fezadan-modal {
+        display: flex; flex-direction: column;
+        width: min(100%, 400px); max-height: calc(100dvh - 40px);
+        background: var(--fm-bg); border: 1px solid var(--fm-border);
+        border-radius: 12px; overflow: hidden;
+    }
+    .fezadan-modal-header {
+        display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        padding: 8px 8px 8px 16px; background: var(--fm-side);
+        border-bottom: 1px solid var(--fm-border);
+    }
+    .fezadan-modal-header h2 { margin: 0; font-size: 15px; font-weight: 600; }
+    .fezadan-modal-close,
+    .fezadan-shortcuts-close {
+        min-width: 34px; min-height: 34px; border: 0; border-radius: 6px;
+        background: transparent; color: var(--fm-muted);
+        font: 400 22px/1 "Inter", system-ui, sans-serif; cursor: pointer;
+    }
+    html:root .fezadan-modal-close:hover, html:root .fezadan-modal-close:focus-visible,
+    html:root .fezadan-shortcuts-close:hover, html:root .fezadan-shortcuts-close:focus-visible {
+        color: var(--fm-text); background: var(--fm-hover);
+        outline: 2px solid var(--fm-focus); outline-offset: -2px;
+    }
+    .fezadan-modal-close:disabled, .fezadan-shortcuts-close:disabled { opacity: .35; cursor: default; }
+    .fezadan-modal-frame {
+        display: block; width: 100%; flex: 1 1 auto;
+        height: min(580px, calc(100dvh - 120px)); border: 0;
+        background: var(--fm-bg);
+    }
+    /* Embedded login page inside the dialog: compact, no page footer credit. */
+    html:root .fezadan-login-embed.task-login #layout-content { padding: 28px 16px; background: var(--fm-bg); }
+    html:root .fezadan-login-embed .fezadan-login { width: 100%; padding: 0; border: 0; background: transparent; }
+    html:root .fezadan-login-embed.task-login .fezadan-credit { display: none; }
+    /* Login-screen extras: a way back to mailboxes already signed in here. */
+    .fezadan-login-accounts { margin: 24px 0 0; padding-top: 16px; border-top: 1px solid var(--fm-border); display: grid; gap: 1px; }
+    .fezadan-login-accounts-title { margin: 0 0 4px; font-size: 12px; color: var(--fm-muted); }
+    html:root .fezadan-login-accounts form { margin: 0; }
+    html:root .fezadan-login-accounts .fezadan-account {
+        display: flex; align-items: center; width: 100%; min-height: 34px;
+        padding: 0 8px; border: 0; border-radius: 6px;
+        background: transparent; color: var(--fm-muted);
+        font: inherit; font-size: 13px; text-align: left; cursor: pointer;
+    }
+    html:root .fezadan-login-accounts .fezadan-account:is(:hover, :focus-visible) {
+        color: var(--fm-text); background: var(--fm-hover);
+    }
+    .fezadan-login-cancel { margin: 14px 0 0; }
+    html:root .fezadan-login-cancel button {
+        width: 100%; min-height: 40px; border: 1px solid var(--fm-border); border-radius: 6px;
+        background: var(--fm-hover); color: var(--fm-text);
+        font: 600 13px "Inter", system-ui, sans-serif; cursor: pointer;
+    }
+    html:root .fezadan-login-cancel button:is(:hover, :focus-visible) { background: var(--fm-selected); }
+    /* Shortcut help is a native modal dialog: focus trapping and Escape are
+       the platform's, and typing fields never reach its "?" listener. */
+    html:root dialog.fezadan-shortcuts {
+        width: min(calc(100% - 32px), 420px); padding: 0;
+        color: var(--fm-text); background: var(--fm-bg);
+        border: 1px solid var(--fm-border); border-radius: var(--fm-radius-lg);
+    }
+    html:root dialog.fezadan-shortcuts::backdrop { background: rgba(15, 15, 15, .55); }
+    .fezadan-shortcuts-head { display: flex; align-items: center; justify-content: space-between; gap: var(--fm-space-3); padding: var(--fm-space-2) var(--fm-space-2) var(--fm-space-2) var(--fm-space-4); border-bottom: 1px solid var(--fm-border); }
+    .fezadan-shortcuts-head h2 { margin: 0; font-size: var(--fm-text-lg); font-weight: 600; }
+    .fezadan-shortcuts dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: var(--fm-space-2) var(--fm-space-4); margin: 0; padding: var(--fm-space-4); }
+    .fezadan-shortcuts dt { color: var(--fm-text); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .fezadan-shortcuts dd { margin: 0; color: var(--fm-muted); }
+}

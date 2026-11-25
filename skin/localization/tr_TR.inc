@@ -1,0 +1,35 @@
+<?php
+// English-only mail UI. Kept as tr_TR so the deploy manifest's required-file
+// check stays valid; the en_US locale is forced for every account via ui.inc.php.
+$labels['fezadannewmessage'] = 'New message';
+$labels['fezadankeyboardhint'] = 'With the message list focused: / Search · C Compose · ? Shortcuts';
+$labels['fezadancomposeoptions'] = 'Delivery options';
+$labels['fezadancomposetools'] = 'More tools';
+$labels['fezadancomposedraft'] = 'Save draft';
+$labels['fezadancomposereply'] = 'Write a reply';
+$labels['fezadancomposeforward'] = 'Forward message';
+$labels['fezadancomposeedit'] = 'Edit message';
+$labels['fezadanloginheading'] = 'Sign in to your email';
+$labels['fezadanlogout'] = 'Sign out';
+$labels['fezadanaccounts'] = 'Accounts';
+$labels['fezadanswitchmailbox'] = 'Switch account';
+$labels['fezadanaddaccount'] = 'Add account';
+$labels['fezadanswitchaccount'] = 'Switch to this account';
+$labels['fezadanaccountslimit'] = 'No more accounts can be added; sign out of one first.';
+$labels['fezadanloginaccounts'] = 'Accounts on this device';
+$labels['fezadanbacktomail'] = 'Back to mail';
+$labels['fezadanaccountexists'] = 'This mail account is already added. Switch to it from the account list.';
+$labels['fezadanremotetitle'] = 'External images were not loaded';
+$labels['fezadanremotehint'] = 'These images may tell the sender that you opened this message. Only show them in messages you trust.';
+$labels['fezadanremoteallow'] = 'Show images in this message';
+$labels['fezadancaptcharobot'] = "I'm not a robot";
+$labels['fezadancaptchapreparing'] = 'Preparing';
+$labels['fezadancaptchachecking'] = 'Checking';
+$labels['fezadancaptchafollow'] = 'Follow the button, then click or tap it when it stops.';
+$labels['fezadancaptchacatch'] = 'Catch';
+$labels['fezadancaptchaverify'] = 'Verify';
+$labels['fezadancaptchafinal'] = 'Click or tap the button to finish verification.';
+$labels['fezadancaptchaverified'] = 'Verification complete';
+$labels['fezadancaptcharequired'] = 'Complete LiteCaptcha verification again before signing in.';
+$labels['fezadancaptchaerror'] = 'Verification failed. Check the box to try again.';
+$labels['fezadancaptchaexpired'] = 'Verification expired. Please verify again.';

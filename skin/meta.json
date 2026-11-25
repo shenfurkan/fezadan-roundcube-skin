@@ -1,0 +1,13 @@
+{
+  "name": "Mail",
+  "author": "Roundcube skin contributors",
+  "license": "Creative Commons Attribution-ShareAlike 3.0",
+  "license-url": "https://creativecommons.org/licenses/by-sa/3.0/",
+  "extends": "elastic",
+  "localization": true,
+  "meta": {
+    "viewport": "width=device-width, initial-scale=1.0, viewport-fit=cover",
+    "theme-color": "#1f1f1f",
+    "msapplication-navbutton-color": "#1f1f1f"
+  }
+}

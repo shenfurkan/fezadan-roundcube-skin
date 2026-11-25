@@ -1,0 +1,26 @@
+This repository is a derivative of the Roundcube Elastic skin.
+
+Roundcube Elastic
+Copyright The Roundcube Dev Team / Aleksander Machniak
+Creative Commons Attribution-ShareAlike 3.0 Unported
+https://creativecommons.org/licenses/by-sa/3.0/
+
+The templates, stylesheet, scripts and markup here were adapted for this skin.
+Elastic is not bundled: Roundcube must provide it. The full license text is in
+LICENSE.
+
+Skiff UI icons
+The adapted compose.svg and inbox.svg icons are Copyright 2023 Skiff World Inc.
+and licensed under the MIT license. See skin/LICENSE.skiff.
+
+Inter font
+skin/fonts/inter-variable.woff2 is Copyright (c) 2016 The Inter Project Authors
+and licensed under the SIL Open Font License 1.1. See skin/fonts/OFL.txt.
+
+The bundled skin/material.js includes React, React DOM, MUI and Emotion code.
+Their license comments are kept in the file and remain under their respective
+MIT licenses.
+
+Fezadan
+The Fezadan name and logo are trademarks of their owner. They appear only in
+branding/fezadan/ and are not part of the neutral default skin.

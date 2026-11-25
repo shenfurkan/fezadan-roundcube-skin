@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" class="dark-mode">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mail</title>
+  <!-- Keep this small frame self-contained; cached app CSS must not leave it unstyled. -->
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url(fonts/inter-variable.woff2?v=4.1) format("woff2");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+    :root { color-scheme: light; --bg: #fafafa; --text: #202020; --muted: #656565; }
+    :root.dark-mode { color-scheme: dark; --bg: #1c1c1c; --text: #efefef; --muted: #afafaf; }
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--bg);
+      color: var(--text);
+      text-align: center;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .fezadan-mark {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 12px;
+      background: var(--muted);
+      opacity: .65;
+      -webkit-mask: url(images/inbox.svg?v=1) center / contain no-repeat;
+      mask: url(images/inbox.svg?v=1) center / contain no-repeat;
+    }
+    body[data-context="contacts"] .fezadan-mark,
+    body[data-context="settings"] .fezadan-mark {
+      -webkit-mask-image: url(images/logo.svg?v=1);
+      mask-image: url(images/logo.svg?v=1);
+    }
+    h1 { margin: 0; font-size: 16px; line-height: 1.5; font-weight: 500; }
+  </style>
+  <script src="watermark.js?v=4"></script>
+</head>
+<body class="fezadan-empty">
+  <span class="fezadan-mark" aria-hidden="true"></span>
+  <h1 id="empty-label">Select a message to read</h1>
+</body>
+</html>

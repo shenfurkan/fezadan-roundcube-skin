@@ -1,0 +1,98 @@
+<roundcube:add_label name="back" />
+<roundcube:add_label name="errortitle" />
+<roundcube:add_label name="options" />
+<roundcube:add_label name="plaintoggle" />
+<roundcube:add_label name="htmltoggle" />
+<roundcube:add_label name="previous" />
+<roundcube:add_label name="next" />
+<roundcube:add_label name="select" />
+<roundcube:add_label name="close" />
+<roundcube:add_label name="browse" />
+<roundcube:add_label name="choosefile" />
+<roundcube:add_label name="choosefiles" />
+<roundcube:object name="doctype" value="html5" />
+<roundcube:if condition="!env:framed || env:extwin" />
+<html>
+<roundcube:else />
+<html class="iframe">
+<roundcube:endif />
+
+<head>
+  <roundcube:object name="meta" />
+  <roundcube:object name="links" />
+  <!-- use-credentials: the origin sits behind a cookie-gated proxy; a
+       credential-less manifest fetch is rejected and the app icon silently
+       falls back to the old favicon. -->
+  <link rel="manifest" href="/manifest.json?v=mail-fezadan-8" crossorigin="use-credentials">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=mail-fezadan-8">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Fezadan Mail">
+  <link rel="stylesheet" href="/deps/bootstrap.min.css">
+  <roundcube:if condition="config:devel_mode" />
+  <link rel="stylesheet/less" href="/styles/styles.less">
+  <roundcube:link rel="stylesheet/less" href="/styles/print.less" condition="env:action == 'print'" />
+  <script src="/deps/less.min.js" data-env="development"></script>
+  <roundcube:else />
+  <link rel="stylesheet" href="/styles/styles.min.css">
+  <roundcube:link rel="stylesheet" href="/styles/print.min.css" condition="env:action == 'print'" />
+  <roundcube:endif />
+  <link rel="stylesheet" href="/styles/fezadan.css?v=mail-fezadan-22">
+  <roundcube:if condition="env:action != 'print'" />
+  <script src="/theme.js"></script>
+  <roundcube:endif />
+  <roundcube:if condition="env:task == 'mail' && in_array(env:action, array('show', 'preview'))" />
+  <script src="/privacy.js" defer></script>
+  <roundcube:endif />
+  <roundcube:if condition="env:task == 'mail' && in_array(env:action, array('', 'show', 'preview'))" />
+  <script src="/inbox.js?v=mail-fezadan-15" defer></script>
+  <roundcube:endif />
+  <!-- MUI islands: the framed message view and the compose screen. -->
+  <roundcube:if
+    condition="env:task == 'mail' && (env:action == 'compose' || (env:framed && in_array(env:action, array('show', 'preview'))))" />
+  <script src="/material.js?v=3" defer></script>
+  <roundcube:endif />
+  <roundcube:if condition="env:task == 'login'" />
+  <script src="/captcha.js" defer></script>
+  <roundcube:endif />
+  <roundcube:if condition="env:task == 'mail' && env:action == 'compose'" />
+  <script src="/compose.js" defer></script>
+  <roundcube:endif />
+  <roundcube:if condition="!env:framed && env:action != 'print'" />
+  <script src="/pwa.js" defer></script>
+  <roundcube:endif />
+  <roundcube:if condition="!env:framed && env:task != 'login' && env:action != 'print'" />
+  <script src="/accounts.js?v=mail-fezadan-8" defer></script>
+  <roundcube:endif />
+</head>
+
+<body class="task-<roundcube:exp expression=" env:error_task ?: env:task ?: 'error'"> action-<roundcube:exp expression="
+  asciiwords(env:action, true, '-' ) ?: 'none'">">
+  <roundcube:if condition="env:task == 'mail' && in_array(env:action, array('', 'show', 'preview'))" />
+  <roundcube:add_label name="reply" />
+  <roundcube:add_label name="replyall" />
+  <roundcube:add_label name="forward" />
+  <roundcube:add_label name="fezadankeyboardhint" />
+  <roundcube:endif />
+  <roundcube:if condition="env:task == 'mail' && env:action == 'compose'" />
+  <template id="fezadan-compose-copy" data-options="<roundcube:label name='fezadancomposeoptions' />"
+    data-tools="<roundcube:label name='fezadancomposetools' />"
+    data-draft="<roundcube:label name='fezadancomposedraft' />"
+    data-heading="<roundcube:label name='fezadannewmessage' />"
+    data-reply="<roundcube:label name='fezadancomposereply' />"
+    data-forward="<roundcube:label name='fezadancomposeforward' />"
+    data-edit="<roundcube:label name='fezadancomposeedit' />" data-recipients="Cc / Bcc"></template>
+  <roundcube:endif />
+  <roundcube:if condition="env:task == 'mail' && in_array(env:action, array('show', 'preview'))" />
+  <template id="fezadan-remote-copy" data-allow="<roundcube:label name='fezadanremoteallow' />">
+    <strong>
+      <roundcube:label name="fezadanremotetitle" />
+    </strong>
+    <span>
+      <roundcube:label name="fezadanremotehint" />
+    </span>
+  </template>
+  <roundcube:endif />
+  <roundcube:if condition="!env:framed || env:extwin" />
+  <div id="<roundcube:exp expression=" env:action=='print' ? 'print-' : ''">layout">
+    <roundcube:endif />
