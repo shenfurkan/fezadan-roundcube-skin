@@ -1,4 +1,12 @@
-This repository is a derivative of the Roundcube Elastic skin.
+This repository contains original build tooling and a runtime skin derived from
+the Roundcube Elastic skin.
+
+License layers
+
+- Original code (build.mjs, ui-src/, scripts/, docs/ and package metadata):
+  GNU General Public License v3.0. See the root LICENSE file.
+- Runtime skin (skin/ and the Elastic-derived templates in branding/fezadan/):
+  Creative Commons Attribution-ShareAlike 3.0 Unported. See skin/LICENSE.
 
 Roundcube Elastic
 Copyright The Roundcube Dev Team / Aleksander Machniak
@@ -6,8 +14,8 @@ Creative Commons Attribution-ShareAlike 3.0 Unported
 https://creativecommons.org/licenses/by-sa/3.0/
 
 The templates, stylesheet, scripts and markup here were adapted for this skin.
-Elastic is not bundled: Roundcube must provide it. The full license text is in
-LICENSE.
+Elastic is not bundled: Roundcube must provide it. The full CC BY-SA text is in
+skin/LICENSE; the root LICENSE is GPL-3.0.
 
 Skiff UI icons
 The adapted compose.svg and inbox.svg icons are Copyright 2023 Skiff World Inc.

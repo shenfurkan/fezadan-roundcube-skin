@@ -61,4 +61,6 @@ Commit the rebuilt `skin/material.js` with source changes. Bump the `?v=mail-ski
 
 ## License
 
-CC BY-SA 3.0. The skin is a derivative of Roundcube Elastic, copyright The Roundcube Dev Team / Aleksander Machniak. The adapted Skiff UI icons are MIT (`skin/LICENSE.skiff`). Inter is under the SIL Open Font License (`skin/fonts/OFL.txt`). See `LICENSE` and `NOTICE`.
+Original repository code (build tooling, scripts, documentation and the React source) is GPL-3.0; see `LICENSE`.
+
+The runtime skin under `skin/` and the Elastic-derived templates in `branding/fezadan/` remain CC BY-SA 3.0 because they are derivatives of Roundcube Elastic, copyright The Roundcube Dev Team / Aleksander Machniak. See `skin/LICENSE`. The adapted Skiff UI icons are MIT (`skin/LICENSE.skiff`). Inter is under the SIL Open Font License (`skin/fonts/OFL.txt`). See `NOTICE` for the full attribution.
